@@ -1,4 +1,5 @@
 ﻿using SFS.UI.ModGUI;
+using UITools;
 using UnityEngine;
 
 namespace OptiSFS
@@ -16,17 +17,24 @@ namespace OptiSFS
         
         void Start()
         {
+            if (!Entrypoint.DEV_HUD) return;
+            
             Transform holder = Builder.CreateHolder(Builder.SceneToAttach.BaseScene, "FPS HUD").transform;
             
-            win = Builder.CreateWindow(holder, Builder.GetRandomID(), 256, 208, draggable: true, titleText: "FPS HUD");
+            win = Builder.CreateWindow(holder, Builder.GetRandomID(), 240, 208, draggable: true, titleText: "FPS HUD");
             win.CreateLayoutGroup(Type.Vertical);
+            win.RegisterPermanentSaving("moe.verdix.optisim_HUD");
+            
+            lastUpdate = Time.realtimeSinceStartup;
+            
             label = Builder.CreateLabel(win, 224, 144, text: "");
             label.FontSize *= 0.8f;
-            lastUpdate = Time.realtimeSinceStartup;
         }
 
         void Update()
         {
+            if (!Entrypoint.DEV_HUD) return;
+            
             frames++;
             if (Input.GetKeyDown(KeyCode.Backslash))
                 Entrypoint.ENABLED ^= true;
@@ -39,7 +47,6 @@ namespace OptiSFS
             }
             
             aeroDT = Entrypoint.AERO_DT;
-            
             label.Text = $"FPS: {fps}\nPatch {(Entrypoint.ENABLED ? "ON" : "OFF")}\nAdt={aeroDT:0.00}ms";
         }
     }

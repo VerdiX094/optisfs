@@ -24,12 +24,14 @@ namespace OptiSFS
 
         public Dictionary<string, FilePath> UpdatableFiles => new Dictionary<string, FilePath>()
         {
-            {"", new FolderPath(ModFolder).ExtendToFile("OptiSFS.dll")}
+            {"https://github.com/VerdiX094/optisfs/releases/latest/download/OptiSFS.dll", new FolderPath(ModFolder).ExtendToFile("OptiSFS.dll")}
         };
         
         public static bool ENABLED = true;
 
         public static float AERO_DT = 0f;
+
+        public const bool DEV_HUD = false;
         
         public override void Early_Load()
         {
