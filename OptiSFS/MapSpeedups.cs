@@ -93,7 +93,7 @@ namespace OptiSFS
         }
     }
     
-    // This optimization is way less important, but it's still an optimization ig
+    /*// This optimization is way less important, but it's still an optimization ig
     [HarmonyPatch(typeof(MapManager), "LateUpdate")]
     public static class MapManager_ResetCache
     {
@@ -115,5 +115,5 @@ namespace OptiSFS
                 }
             }
         }
-    }
+    }*/
 }
