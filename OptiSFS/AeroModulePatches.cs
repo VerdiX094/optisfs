@@ -41,7 +41,8 @@ namespace OptiSFS
         [HarmonyPrefix]
         public static bool Prefix(List<Surface> surfaces)
         {
-            if (!Entrypoint.ENABLED)
+            // Stef has merged the algorithm into vanilla, and it will most likely come in the next update (which I don't know when will happen)
+            if (!Entrypoint.ENABLED || Entrypoint.HAS_MERGED_RADIXSORT)
                 return true;
             
             SurfaceEndXRadixSort.Sort(ref surfaces);

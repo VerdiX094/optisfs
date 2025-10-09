@@ -31,10 +31,14 @@ namespace OptiSFS
 
         public static float AERO_DT = 0f;
 
-        public const bool DEV_HUD = false;
+        public const bool DEV_HUD = true;
+
+        public static bool HAS_MERGED_RADIXSORT = false;
         
         public override void Early_Load()
         {
+            HAS_MERGED_RADIXSORT = !Application.version.Contains("1.5.10");
+            
             if (ENABLED)
                 new Harmony(ModNameID).PatchAll();
             
