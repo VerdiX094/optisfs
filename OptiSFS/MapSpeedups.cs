@@ -93,6 +93,12 @@ namespace OptiSFS
         }
     }
     
+    [HarmonyPatch(typeof(TrajectoryDrawer), "DrawOrbit")]
+    public static class TrajectoryDrawOptimizations
+    {
+        
+    }
+    
     /*// This optimization is way less important, but it's still an optimization ig
     [HarmonyPatch(typeof(MapManager), "LateUpdate")]
     public static class MapManager_ResetCache

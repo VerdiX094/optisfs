@@ -2,9 +2,11 @@
 using HarmonyLib;
 using ModLoader;
 using ModLoader.Helpers;
+using SFS.Builds;
 using SFS.IO;
 using UITools;
 using UnityEngine;
+using UnityEngine.UI;
 
 namespace OptiSFS
 {
