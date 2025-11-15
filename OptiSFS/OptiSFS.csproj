@@ -364,7 +364,9 @@
     </ItemGroup>
     <ItemGroup>
         <Compile Include="AeroModulePatches.cs" />
+        <Compile Include="Benchmark.cs" />
         <Compile Include="BuildOptimizations.cs" />
+        <Compile Include="FastGL.cs" />
         <Compile Include="FastPolygonIntersect.cs" />
         <Compile Include="MapSpeedups.cs" />
         <Compile Include="Entrypoint.cs" />

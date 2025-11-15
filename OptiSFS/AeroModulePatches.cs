@@ -10,31 +10,6 @@ using UnityEngine;
 
 namespace OptiSFS
 {
-    [HarmonyPatch(typeof(Aero_Rocket), "GetDragSurfaces", typeof(Matrix2x2))]
-    public static class AeroBenchmark
-    {
-        [HarmonyPrefix]
-        public static bool Prefix(AeroModule __instance, ref Stopwatch __state)
-        {
-            if (__instance is Aero_Rocket ar || true)
-            {
-                __state = Stopwatch.StartNew();
-            }
-            
-            return true;
-        }
-
-        [HarmonyPostfix]
-        public static void Postfix(AeroModule __instance, ref Stopwatch __state)
-        {
-            if ((__instance is Aero_Rocket ar && __state != null) || true)
-            {
-                __state.Stop();
-                Entrypoint.AERO_DT = (float)__state.Elapsed.TotalMilliseconds;
-            }
-        }
-    }
-    
     [HarmonyPatch(typeof(AeroModule), "SortDragSurfacesByEndX")]
     public static class SortingPatch
     {
@@ -42,7 +17,7 @@ namespace OptiSFS
         public static bool Prefix(List<Surface> surfaces)
         {
             // Stef has merged the algorithm into vanilla, and it will most likely come in the next update (which I don't know when will happen)
-            if (!Entrypoint.ENABLED || Entrypoint.HAS_MERGED_RADIXSORT)
+            if (!Entrypoint.PatchEnabled || Entrypoint.VersionHasRadixSort)
                 return true;
             
             SurfaceEndXRadixSort.Sort(ref surfaces);
@@ -58,7 +33,7 @@ namespace OptiSFS
         [HarmonyPrefix]
         public static bool Prefix(List<Surface> surfaces)
         {
-            if (!Entrypoint.ENABLED)
+            if (!Entrypoint.PatchEnabled)
                 return true;
             
             var removeIndexes = new HashSet<int>();
@@ -135,7 +110,7 @@ namespace OptiSFS
         [HarmonyPrefix]
         public static bool Prefix(List<Surface> surfaces, float maxSlope, ref List<Surface> __result)
         {
-            if (!Entrypoint.ENABLED)
+            if (!Entrypoint.PatchEnabled)
                 return true;
             
             __result = new List<Surface>();
@@ -157,7 +132,7 @@ namespace OptiSFS
         [HarmonyPrefix]
         public static bool Prefix(PartHolder partsHolder, Matrix2x2 rotate, ref List<Surface> __result)
         {
-            if (!Entrypoint.ENABLED)
+            if (!Entrypoint.PatchEnabled)
                 return true;
             
             List<Surface> output = new List<Surface>();

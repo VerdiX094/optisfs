@@ -19,7 +19,7 @@ namespace OptiSFS
         [HarmonyPrefix]
         public static bool Prefix(ConvexPolygon[] A, ConvexPolygon[] B, float overlapThreshold, ref bool __result)
         {
-            if (!Entrypoint.ENABLED)
+            if (!Entrypoint.PatchEnabled)
                 return true;
             
             __result = FastPolygon.FastIntersect(A, B, overlapThreshold);
@@ -34,7 +34,7 @@ namespace OptiSFS
         [HarmonyPrefix]
         public static bool Prefix(BuildSelector __instance)
         {
-            if (!Entrypoint.ENABLED)
+            if (!Entrypoint.PatchEnabled)
                 return true;
 
             List<Part> holdGrid = new List<Part>();
@@ -83,14 +83,14 @@ namespace OptiSFS
         [HarmonyPrefix]
         public static bool Prefix(List<Part> parts, bool symmetry, Color color, float width, float depth = 1f)
         {
-            if (!Entrypoint.ENABLED) 
+            if (!Entrypoint.PatchEnabled) 
                 return true;
             
             var cam = ActiveCamera.main.activeCamera.Value.camera;
             float pixelSize = cam.ScreenToWorldPoint(Vector3.right).x - cam.ScreenToWorldPoint(Vector3.zero).x;
             
             
-            Stopwatch sw = Stopwatch.StartNew();
+            //Stopwatch sw = Stopwatch.StartNew();
             
             starts = new List<Vector3>();
             ends = new List<Vector3>();
@@ -126,14 +126,14 @@ namespace OptiSFS
                 }
             }
 
-            sw.Stop();
-            MsgDrawer.main.Log(sw.Elapsed.TotalMilliseconds.ToString());
+            //sw.Stop();
+            //MsgDrawer.main.Log(sw.Elapsed.TotalMilliseconds.ToString());
             
             //MsgDrawer.main.Log(pixelSize.ToString());
             
             if (pixelSize < width / 2) 
-                Utility.Batched_DrawCircles(circleCenters, width * 0.5f, pixelSize >= width / 4 ? 8 : 12, color, depth);
-            Utility.Batched_DrawLines(starts, ends, width, color, depth);
+                FastGL.Batched_DrawCircles(circleCenters, width * 0.5f, pixelSize >= width / 4 ? 8 : 12, color, depth);
+            FastGL.Batched_DrawLines(starts, ends, width, color, depth);
 
             return false;
         }
@@ -146,7 +146,7 @@ namespace OptiSFS
         [HarmonyPrefix]
         public static bool Prefix(PolygonCollider __instance)
         {
-            if (!Entrypoint.ENABLED) return true;
+            if (!Entrypoint.PatchEnabled) return true;
             
             if (SceneManager.GetActiveScene().name == "Build_PC") return false;
             
@@ -193,7 +193,7 @@ namespace OptiSFS
         [HarmonyPostfix]
         public static void Postfix(Part __instance)
         {
-            if (!Entrypoint.ENABLED) return;
+            if (!Entrypoint.PatchEnabled) return;
             if (SceneManager.GetActiveScene().name != "Build_PC") return;
 
             foreach (Collider2D col in __instance.GetComponentsInChildren<Collider2D>())

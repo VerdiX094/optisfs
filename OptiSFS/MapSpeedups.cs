@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Collections.Generic;
 using HarmonyLib;
+using SFS.Cameras;
 using SFS.World;
 using SFS.World.Maps;
 using UnityEngine;
@@ -11,7 +13,7 @@ namespace OptiSFS
     {
         public static bool Prefix(ElementDrawer __instance, int priority, Vector2 size, Vector2 position, TextMesh textMesh, bool clearBelow)
         {
-            if (!Entrypoint.ENABLED)
+            if (!Entrypoint.PatchEnabled)
                 return true;
             
             ElementDrawer.Element element = new ElementDrawer.Element
@@ -41,16 +43,16 @@ namespace OptiSFS
                 Vector2 distance = element.position - other.position;
                 distance = new Vector2(distance.x * cos - distance.y * sin, distance.x * sin + distance.y * cos);
                 
-                float boundsDistanceX = Mathf.Abs(distance.x) - element.size.x - other.size.x;
+                float boundsDistanceX = Math.Abs(distance.x) - element.size.x - other.size.x;
                 if (boundsDistanceX > epsilon)
                     continue;
 		
-                float boundsDistanceY = Mathf.Abs(distance.y) - element.size.y - other.size.y;
+                float boundsDistanceY = Math.Abs(distance.y) - element.size.y - other.size.y;
 		
                 if (boundsDistanceY > epsilon)
                     continue;
 		
-                float alpha = Mathf.Max(boundsDistanceX, boundsDistanceY) / epsilon;
+                float alpha = Math.Max(boundsDistanceX, boundsDistanceY) / epsilon;
                 
                 if (element.priority > other.priority)
                 {
@@ -91,12 +93,62 @@ namespace OptiSFS
             
             return false;
         }
+
+        public static void ApplyTransparency(List<ElementDrawer.Element> elements)
+        {
+            GenericRadixSort.Sort(ref elements, elem => uint.MaxValue - (uint)(elem.priority ^ 0x80000000));
+            
+            float epsilon = Map.view.ToConstantSize(0.01f);
+            
+            float cos = Mathf.Cos(-GameCamerasManager.main.map_Camera.CameraRotationRadians);
+            float sin = Mathf.Sin(-GameCamerasManager.main.map_Camera.CameraRotationRadians);
+        }
     }
     
-    [HarmonyPatch(typeof(TrajectoryDrawer), "DrawOrbit")]
+    [HarmonyPatch(typeof(TrajectoryDrawer), "DrawOrbit", typeof(Orbit), typeof(double), typeof(double), typeof(string), typeof(string), typeof(Color), typeof(float), typeof(float), typeof(LineDrawer))]
     public static class TrajectoryDrawOptimizations
     {
-        
+        [HarmonyPrefix]
+        public static bool Prefix(Orbit orbit, double startTrueAnomaly, double endTrueAnomaly, string startText, string endText, Color c, float startAlpha, float endAlpha, LineDrawer lineDrawer)
+        {
+            if (!Entrypoint.PatchEnabled)
+                return true;
+
+            Vector3[] points = Array.Empty<Vector3>();
+            
+            if (c.a != 0 && (startAlpha != 0 || endAlpha != 0))
+            {
+                points = orbit.GetPoints(startTrueAnomaly, endTrueAnomaly, GetLineResolution(), 0.001);
+                lineDrawer.DrawLine(points, orbit.Planet, c * new Color(1f, 1f, 1f, startAlpha),
+                    c * new Color(1f, 1f, 1f, endAlpha));
+            }
+
+            if (startText != null && points.Length > 0)
+            {
+                MapDrawer.DrawPointWithText(15, c, startText, 40, c, orbit.Planet.mapHolder.position + points[0], -orbit.GetVelocityAtTrueAnomaly(endTrueAnomaly).ToVector2.normalized, 4, 4);
+            }
+
+            if (endText != null && points.Length > 0)
+            {
+                MapDrawer.DrawPointWithText(15, c, endText, 40, c, orbit.Planet.mapHolder.position + points[points.Length-1],
+                    orbit.GetVelocityAtTrueAnomaly(endTrueAnomaly).ToVector2.normalized, 4, 4);
+            }
+
+            return false;
+
+            int GetLineResolution()
+            {
+                const int lineLength = 5;
+                float alt = (float)(Math.Min(orbit.apoapsis, orbit.Planet.SOI) / 1000.0);
+                
+                Camera cam = ActiveCamera.Camera.camera;
+                Vector3 p1 = cam.WorldToScreenPoint(new Vector3(0, 0, orbit.Planet.mapHolder.position.z));
+                Vector3 p2 = cam.WorldToScreenPoint(Vector3.right * alt + new Vector3(0, 0, orbit.Planet.mapHolder.position.z));
+                float radiusPixels = Vector2.Distance(p1, p2);
+
+                return Mathf.Max(3, Mathf.Min(Mathf.CeilToInt(2 * radiusPixels * Mathf.PI / lineLength), 250));
+            }
+        }
     }
     
     /*// This optimization is way less important, but it's still an optimization ig

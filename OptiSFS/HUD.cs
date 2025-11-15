@@ -1,6 +1,9 @@
 ﻿using SFS.UI.ModGUI;
 using UITools;
 using UnityEngine;
+using System.Collections.Generic;
+using System.Text;
+using TMPro;
 
 namespace OptiSFS
 {
@@ -13,31 +16,33 @@ namespace OptiSFS
         private float lastUpdate = 0;
         private float fps = 0;
 
-        private float aeroDT = 0f;
+        public static Dictionary<string, double> times = new Dictionary<string, double>();
         
         void Start()
         {
-            if (!Entrypoint.DEV_HUD) return;
+            if (!Entrypoint.DevelopmentMode) return;
             
             Transform holder = Builder.CreateHolder(Builder.SceneToAttach.BaseScene, "FPS HUD").transform;
             
-            win = Builder.CreateWindow(holder, Builder.GetRandomID(), 240, 208, draggable: true, titleText: "FPS HUD");
+            win = Builder.CreateWindow(holder, Builder.GetRandomID(), 360, 480, draggable: true, titleText: "FPS HUD");
             win.CreateLayoutGroup(Type.Vertical);
             win.RegisterPermanentSaving("moe.verdix.optisim_HUD");
             
             lastUpdate = Time.realtimeSinceStartup;
             
-            label = Builder.CreateLabel(win, 224, 144, text: "");
+            label = Builder.CreateLabel(win, 328, 14400, text: "");
+            label.AutoFontResize = false;
             label.FontSize *= 0.8f;
+            label.TextAlignment = TextAlignmentOptions.TopJustified;
         }
 
         void Update()
         {
-            if (!Entrypoint.DEV_HUD) return;
+            if (!Entrypoint.DevelopmentMode) return;
             
             frames++;
             if (Input.GetKeyDown(KeyCode.Backslash))
-                Entrypoint.ENABLED ^= true;
+                Entrypoint.PatchEnabled ^= true;
 
             if (Time.realtimeSinceStartup - lastUpdate > 0.5)
             {
@@ -46,8 +51,14 @@ namespace OptiSFS
                 frames = 0;
             }
             
-            aeroDT = Entrypoint.AERO_DT;
-            label.Text = $"FPS: {fps}\nPatch {(Entrypoint.ENABLED ? "ON" : "OFF")}\nAdt={aeroDT:0.00}ms";
+            StringBuilder sb = new StringBuilder();
+
+            foreach (var key in times.Keys)
+            {
+                sb.AppendLine($"{key}: {times[key].Round(3)}ms");
+            }
+            
+            label.Text = $"FPS: {fps}\nPatch {(Entrypoint.PatchEnabled ? "ON" : "OFF")}\n{sb}";
         }
     }
 }

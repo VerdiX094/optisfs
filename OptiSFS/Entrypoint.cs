@@ -1,15 +1,13 @@
 ﻿using System.Collections.Generic;
 using HarmonyLib;
 using ModLoader;
-using ModLoader.Helpers;
-using SFS.Builds;
 using SFS.IO;
 using UITools;
 using UnityEngine;
-using UnityEngine.UI;
 
 namespace OptiSFS
 {
+    // ReSharper disable once ClassNeverInstantiated.Global
     public class Entrypoint : Mod, IUpdatable
     {
         public override string ModNameID => "moe.verdix.optisfs";
@@ -29,28 +27,25 @@ namespace OptiSFS
             {"https://github.com/VerdiX094/optisfs/releases/latest/download/OptiSFS.dll", new FolderPath(ModFolder).ExtendToFile("OptiSFS.dll")}
         };
         
-        public static bool ENABLED = true;
+        public static bool PatchEnabled = true;
 
-        public static float AERO_DT = 0f;
+        public const bool DevelopmentMode = true;
 
-        public const bool DEV_HUD = true;
-
-        public static bool HAS_MERGED_RADIXSORT = false;
+        public static bool VersionHasRadixSort;
         
         public override void Early_Load()
         {
-            HAS_MERGED_RADIXSORT = !Application.version.Contains("1.5.10");
+            VersionHasRadixSort = !Application.version.Contains("1.5.10");
             
-            if (ENABLED)
+            if (PatchEnabled)
                 new Harmony(ModNameID).PatchAll();
             
             if (!SurfaceEndXRadixSort.Test()) Debug.Log("SURFACE SORT TEST FAILED");
 
             new GameObject().AddComponent<HUD>();
-        }
-
-        public override void Load()
-        {
+            
+            if (DevelopmentMode)
+                Benchmark.ApplyPatches();
         }
     }
 }
