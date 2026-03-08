@@ -1,10 +1,8 @@
 ﻿using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 using HarmonyLib;
 using ModLoader;
 using SFS.IO;
-using SFS.UI;
 using SFS.World.Drag;
 using UITools;
 using UnityEngine;
@@ -21,9 +19,9 @@ namespace OptiSFS
 
         public override string Author => "VerdiX094";
 
-        public override string MinimumGameVersionNecessary => "1.6.0.3";
+        public override string MinimumGameVersionNecessary => "1.6.0.14";
 
-        public override string ModVersion => "v0.1";
+        public override string ModVersion => "v0.2";
 
         public override string Description => "Various optimizations for Spaceflight Simulator.";
 
