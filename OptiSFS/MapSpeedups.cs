@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using HarmonyLib;
 using SFS.Cameras;
@@ -23,8 +23,14 @@ namespace OptiSFS
                 position = position,
                 textMesh = textMesh
             };
+
+            // element was never added to the list when clearBelow=false,
+            // causing trajectories to disappear when opening the map.
             if (!clearBelow)
+            {
+                __instance.elements.Add(element);
                 return false;
+            }
 	
             float epsilon = Map.view.ToConstantSize(0.01f);
             
@@ -60,7 +66,7 @@ namespace OptiSFS
                     {
                         if (alpha > 0f)
                         {
-                            other.textMesh.color *= new Color(1f, 1f, 1f, alpha);
+                            other.textMesh.color = new Color(1f, 1f, 1f, alpha);
                         }
                         else if (other.textMesh.gameObject.activeSelf)
                         {
@@ -76,7 +82,7 @@ namespace OptiSFS
                 {
                     if (alpha > 0f)
                     {
-                        element.textMesh.color *= new Color(1f, 1f, 1f, alpha);
+                        element.textMesh.color = new Color(1f, 1f, 1f, alpha);
                     }
                     else if (element.textMesh.gameObject.activeSelf)
                     {
@@ -84,7 +90,7 @@ namespace OptiSFS
                     }
                 }
             }
-            __instance.elements.Add(element); // Why is this after the clearBelow check?
+            __instance.elements.Add(element);
 
             if (threw != 0)
             {
