@@ -24,8 +24,10 @@ namespace OptiSFS
                 textMesh = textMesh
             };
 
-            // element was never added to the list when clearBelow=false,
-            // causing trajectories to disappear when opening the map.
+            // FIX: Always register the element regardless of clearBelow.
+            // Previously, returning false here without adding the element caused
+            // trajectory/conic patch elements to disappear on map open (M key),
+            // because they use clearBelow=false and were never added to the list.
             if (!clearBelow)
             {
                 __instance.elements.Add(element);
