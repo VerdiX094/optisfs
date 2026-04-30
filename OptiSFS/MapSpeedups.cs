@@ -24,10 +24,8 @@ namespace OptiSFS
                 textMesh = textMesh
             };
 
-            // FIX: Always register the element regardless of clearBelow.
-            // Previously, returning false here without adding the element caused
-            // trajectory/conic patch elements to disappear on map open (M key),
-            // because they use clearBelow=false and were never added to the list.
+            // Fix: element was never added to the list when clearBelow=false,
+			// causing trajectories to disappear when opening the map.
             if (!clearBelow)
             {
                 __instance.elements.Add(element);
@@ -68,7 +66,7 @@ namespace OptiSFS
                     {
                         if (alpha > 0f)
                         {
-                            other.textMesh.color = new Color(1f, 1f, 1f, alpha);
+                            other.textMesh.color *= new Color(1f, 1f, 1f, alpha);
                         }
                         else if (other.textMesh.gameObject.activeSelf)
                         {
@@ -84,7 +82,7 @@ namespace OptiSFS
                 {
                     if (alpha > 0f)
                     {
-                        element.textMesh.color = new Color(1f, 1f, 1f, alpha);
+                        element.textMesh.color *= new Color(1f, 1f, 1f, alpha);
                     }
                     else if (element.textMesh.gameObject.activeSelf)
                     {
@@ -92,7 +90,7 @@ namespace OptiSFS
                     }
                 }
             }
-            __instance.elements.Add(element);
+            __instance.elements.Add(element); // Why is this after the clearBelow check?
 
             if (threw != 0)
             {
