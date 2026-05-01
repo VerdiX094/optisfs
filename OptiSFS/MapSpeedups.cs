@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using HarmonyLib;
 using SFS.Cameras;
@@ -24,7 +24,10 @@ namespace OptiSFS
                 textMesh = textMesh
             };
             if (!clearBelow)
+            {
+                __instance.elements.Add(element);
                 return false;
+            }
 	
             float epsilon = Map.view.ToConstantSize(0.01f);
             
