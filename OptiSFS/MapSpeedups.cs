@@ -23,9 +23,6 @@ namespace OptiSFS
                 position = position,
                 textMesh = textMesh
             };
-
-            // Fix: element was never added to the list when clearBelow=false,
-			// causing trajectories to disappear when opening the map.
             if (!clearBelow)
             {
                 __instance.elements.Add(element);
